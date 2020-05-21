@@ -1,4 +1,4 @@
-FROM openjdk:8 AS builder
+FROM adoptopenjdk/openjdk13:alpine AS builder
 WORKDIR /http4s
 COPY project project
 COPY src src
@@ -11,7 +11,8 @@ RUN ./sbt assembly -batch && \
     rm -Rf ~/.sbt && \
     rm -Rf ~/.ivy2 && \
     rm -Rf /var/cache
-FROM openjdk:alpine
+
+FROM adoptopenjdk/openjdk13:alpine-jre
 WORKDIR /http4s
 COPY --from=builder /http4s/http4s-assembly-1.0.jar /http4s/http4s-assembly-1.0.jar
 CMD ["java", "-server", "-Xms2g", "-Xmx2g", "-XX:NewSize=1g", "-XX:MaxNewSize=1g", "-XX:InitialCodeCacheSize=256m", "-XX:ReservedCodeCacheSize=256m", "-XX:+UseParallelGC", "-XX:+UseNUMA", "-XX:-UseBiasedLocking", "-XX:+AlwaysPreTouch", "-jar", "http4s-assembly-1.0.jar", "tfb-database"]
